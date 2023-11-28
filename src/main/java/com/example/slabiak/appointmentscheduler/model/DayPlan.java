@@ -16,36 +16,6 @@ public class DayPlan {
         breaks = new ArrayList();
     }
 
-//for conditionl polymorphism
-    public List<TimePeriod> timePeriodsWithBreaksExcluded() {
-        List<TimePeriod> timePeriodsWithBreaksExcluded = new ArrayList<>();
-        timePeriodsWithBreaksExcluded.add(getWorkingHours());
-        List<TimePeroid> breaks = getBreaks();
-
-        if (!breaks.isEmpty()) {
-            List<TimePeriodAdjuster> adjusters = Arrays.asList(
-                    new AdjusterBeforeStart(),
-                    new AdjusterAfterEnd()
-                    // Add more adjusters as needed
-            );
-
-            for (TimePeroid breakPeriod : breaks) {
-                for (TimePeriod timePeriod : timePeriodsWithBreaksExcluded) {
-                    for (TimePeriodAdjuster adjuster : adjusters) {
-                        adjuster.adjust(timePeriod, breakPeriod);
-                    }
-                }
-            }
-
-            Collections.sort(timePeriodsWithBreaksExcluded);
-        }
-
-        return timePeriodsWithBreaksExcluded;
-    }
-
-    private TimePeriod getWorkingHours() {
-        return  null;
-    }
 
 /*    public List<TimePeroid> timePeroidsWithBreaksExcluded() {
         ArrayList<TimePeroid> timePeroidsWithBreaksExcluded = new ArrayList<>();
@@ -131,9 +101,9 @@ public class DayPlan {
 */
 
 
-    /*public TimePeriod getWorkingHours() {
-        //return workingHours;
-    }*/
+    public TimePeroid getWorkingHours() {
+        return workingHours;
+    }
 
     public void setWorkingHours(TimePeroid workingHours) {
         this.workingHours = workingHours;
@@ -155,4 +125,29 @@ public class DayPlan {
         breaks.add(breakToAdd);
     }
 
+    public List<TimePeroid> timePeroidsWithBreaksExcluded() {
+        List<TimePeroid> timePeriodsWithBreaksExcluded = new ArrayList<>();
+        timePeriodsWithBreaksExcluded.add(getWorkingHours());
+        List<TimePeroid> breaks = getBreaks();
+
+        if (!breaks.isEmpty()) {
+            List<TimePeriodAdjuster> adjusters = Arrays.asList(
+                    new AdjusterBeforeStart(),
+                    new AdjusterAfterEnd()
+                    // Add more adjusters as needed
+            );
+
+            for (TimePeroid breakPeriod : breaks) {
+                for (TimePeroid timePeriod : timePeriodsWithBreaksExcluded) {
+                    for (TimePeriodAdjuster adjuster : adjusters) {
+                        adjuster.adjust(timePeriod, breakPeriod);
+                    }
+                }
+            }
+
+            Collections.sort(timePeriodsWithBreaksExcluded);
+        }
+
+        return timePeriodsWithBreaksExcluded;
+    }
 }
