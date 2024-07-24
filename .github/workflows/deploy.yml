@@ -17,20 +17,24 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '17'
-          distribution: 'temurin'  # You can change to 'zulu', 'adopt', etc. if preferred
+          distribution: 'temurin'
 
       - name: Build with Maven (skip tests)
         run: mvn clean package -DskipTests
 
-      - name: Create ZIP Archive
+      - name: Zip Deployment Artifacts
         run: |
-          zip spring-boot-application.zip target/*.jar
+          mkdir deployment
+          cp target/*.jar deployment/
+          cp appspec.yml deployment/
+          cd deployment
+          zip -r ../deployment-package.zip .
 
-      - name: Upload Artifact
+      - name: Upload Deployment Package
         uses: actions/upload-artifact@v3
         with:
-          name: spring-boot-application
-          path: spring-boot-application.zip
+          name: deployment-package
+          path: deployment-package.zip
 
       - name: Deploy to S3
         env:
@@ -39,7 +43,7 @@ jobs:
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_REGION: 'us-east-1'
         run: |
-          aws s3 cp spring-boot-application.zip s3://s3bucketmerin12/spring-boot-application.zip
+          aws s3 cp deployment-package.zip s3://s3bucketmerin12/deployment-package.zip
 
       - name: Deploy to EC2
         env:
@@ -51,4 +55,4 @@ jobs:
           aws deploy create-deployment \
             --application-name aws-demo-ec2-code-deploy \
             --deployment-group-name aws-ec2-code-deploy-group \
-            --s3-location bucket=s3bucketmerin12,key=spring-boot-application.zip,bundleType=zip
+            --s3-location bucket=s3bucketmerin12,key=deployment-package.zip,bundleType=zip
