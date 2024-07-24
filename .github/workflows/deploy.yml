@@ -22,19 +22,20 @@ jobs:
       - name: Build with Maven (skip tests)
         run: mvn clean package -DskipTests
 
-      - name: Prepare Deployment Package
+      - name: Package as ZIP
         run: |
-          mkdir deployment
-          cp target/appointmentscheduler-1.0.5.jar deployment/
-          cp appspec.yml deployment/
-          cd deployment
-          zip -r ../deployment-package.zip .
+          mkdir -p deploy/scripts
+          cp target/*.jar deploy/
+          cp appspec.yml deploy/
+          cp scripts/deploy.sh deploy/scripts/
+          cd deploy
+          zip -r deployment.zip ./*
 
-      - name: Upload Deployment Package
+      - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: deployment-package
-          path: deployment-package.zip
+          name: deployment
+          path: deploy/deployment.zip
 
       - name: Deploy to S3
         env:
@@ -43,7 +44,7 @@ jobs:
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_REGION: 'us-east-1'
         run: |
-          aws s3 cp deployment-package.zip s3://s3bucketmerin12/deployment-package.zip
+          aws s3 cp deploy/deployment.zip s3://s3bucketmerin12/deployment.zip
 
       - name: Deploy to EC2
         env:
@@ -55,4 +56,4 @@ jobs:
           aws deploy create-deployment \
             --application-name aws-demo-ec2-code-deploy \
             --deployment-group-name aws-ec2-code-deploy-group \
-            --s3-location bucket=s3bucketmerin12,key=deployment-package.zip,bundleType=zip
+            --s3-location bucket=s3bucketmerin12,key=deployment.zip,bundleType=zip
