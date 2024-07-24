@@ -22,10 +22,10 @@ jobs:
       - name: Build with Maven (skip tests)
         run: mvn clean package -DskipTests
 
-      - name: Zip Deployment Artifacts
+      - name: Prepare Deployment Package
         run: |
           mkdir deployment
-          cp target/*.jar deployment/
+          cp target/appointmentscheduler-1.0.5.jar deployment/
           cp appspec.yml deployment/
           cd deployment
           zip -r ../deployment-package.zip .
