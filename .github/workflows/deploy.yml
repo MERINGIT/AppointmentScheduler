@@ -22,11 +22,15 @@ jobs:
       - name: Build with Maven (skip tests)
         run: mvn clean package -DskipTests
 
+      - name: Create ZIP Archive
+        run: |
+          zip spring-boot-application.zip target/*.jar
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: spring-boot-application
-          path: target/*.jar
+          path: spring-boot-application.zip
 
       - name: Deploy to S3
         env:
@@ -35,7 +39,7 @@ jobs:
           AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
           AWS_REGION: 'us-east-1'
         run: |
-          aws s3 cp target/*.jar s3://s3bucketmerin12/spring-boot-application.jar
+          aws s3 cp spring-boot-application.zip s3://s3bucketmerin12/spring-boot-application.zip
 
       - name: Deploy to EC2
         env:
@@ -47,4 +51,4 @@ jobs:
           aws deploy create-deployment \
             --application-name aws-demo-ec2-code-deploy \
             --deployment-group-name aws-ec2-code-deploy-group \
-            --s3-location bucket=s3bucketmerin12,key=spring-boot-application.jar,bundleType=jar
+            --s3-location bucket=s3bucketmerin12,key=spring-boot-application.zip,bundleType=zip
