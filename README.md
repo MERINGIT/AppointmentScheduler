@@ -20,7 +20,7 @@ You can use the following credentials with live demo:
 | `corporate customer` | customer_c |qwerty123 |
 | `retail customer` | customer_r |qwerty123 |
 
-## Blog,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
+## Blog
 
 This application is being described in [devoxify.com](https://devoxify.com/) blog. If you are interested in how this project was created, what issues were encoutered and how they were solved I highly encourage you to visit this blog.
 
