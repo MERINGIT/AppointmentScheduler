@@ -1,0 +1,47 @@
+name: Deploy Spring Boot Application
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set Up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      - name: Build with Maven (skip tests)
+        run: mvn clean package -DskipTests
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: spring-boot-application
+          path: target/*.jar
+
+      - name: Deploy to S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+        run: |
+          aws s3 cp target/*.jar s3://your-bucket/spring-boot-application.jar
+
+      - name: Deploy to EC2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: 'us-east-1'
+        run: |
+          aws deploy create-deployment \
+            --application-name your-codedeploy-app \
+            --deployment-group-name your-deployment-group \
+            --s3-location bucket=your-bucket,key=spring-boot-application.jar,bundleType=jar
