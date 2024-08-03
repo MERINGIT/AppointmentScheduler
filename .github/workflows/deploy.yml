@@ -55,5 +55,5 @@ jobs:
         run: |
           aws deploy create-deployment \
             --application-name aws-demo-ec2-code-deploy \
-            --deployment-group-name AppointmentScheduler \
+            --deployment-group-name AppointmentSchedulerCodeDeploy \
             --s3-location bucket=s3bucketmerin12,key=deployment.zip,bundleType=zip
